@@ -37,10 +37,15 @@ contract TTTDemo is CCIPReceiver, OwnerIsCreator {
 
     uint8[9] initialCombination = [0, 0, 0, 0, 0, 0, 0, 0, 0];
 
-    function getPlayer1Status(bytes32 _sessionId) external view returns (uint8[9] memory){
+    function getPlayer1Status(
+        bytes32 _sessionId
+    ) external view returns (uint8[9] memory) {
         return gameSessions[_sessionId].player1Status;
     }
-    function getPlayer2Status(bytes32 _sessionId) external view returns (uint8[9] memory){
+
+    function getPlayer2Status(
+        bytes32 _sessionId
+    ) external view returns (uint8[9] memory) {
         return gameSessions[_sessionId].player2Status;
     }
 
@@ -75,17 +80,18 @@ contract TTTDemo is CCIPReceiver, OwnerIsCreator {
 
     /// @notice Constructor initializes the contract with the router address.
     /// @param router The address of the router contract.
-    constructor(address router) CCIPReceiver(router) {
-    }
+    constructor(address router) CCIPReceiver(router) {}
 
     function updateRouter(address routerAddr) external {
         _router = routerAddr;
     }
 
     function start(uint64 destinationChainSelector, address receiver) external {
-        bytes32 uniqueId = keccak256(abi.encodePacked(block.timestamp, msg.sender));
+        bytes32 uniqueId = keccak256(
+            abi.encodePacked(block.timestamp, msg.sender)
+        );
         sessionIds.push(uniqueId);
-        gameSessions[uniqueId]= GameSession(
+        gameSessions[uniqueId] = GameSession(
             uniqueId,
             msg.sender,
             address(0),
@@ -93,13 +99,19 @@ contract TTTDemo is CCIPReceiver, OwnerIsCreator {
             msg.sender,
             initialCombination,
             initialCombination
-            );
+        );
 
         sendMessage(destinationChainSelector, receiver, gameSessions[uniqueId]);
     }
 
-    function checkWin(uint8[9] memory playerStatus) public pure returns(bool _return){
-        if(horizontalCheck(playerStatus) || verticalCheck(playerStatus) || diagonalCheck(playerStatus)) {
+    function checkWin(
+        uint8[9] memory playerStatus
+    ) public pure returns (bool _return) {
+        if (
+            horizontalCheck(playerStatus) ||
+            verticalCheck(playerStatus) ||
+            diagonalCheck(playerStatus)
+        ) {
             return true;
         }
 
@@ -153,68 +165,93 @@ contract TTTDemo is CCIPReceiver, OwnerIsCreator {
         return messageId;
     }
 
-        // check if the position is taken then move
+    // check if the position is taken then move
     function move(
-        uint256 x, 
-        uint256 y, 
-        uint256 player, 
-        bytes32 sessionId, 
+        uint256 x,
+        uint256 y,
+        uint256 player,
+        bytes32 sessionId,
         uint64 destinationChainSelector,
-        address receiver) 
-        public  
-    {
+        address receiver
+    ) public {
         GameSession memory gs = gameSessions[sessionId];
         // make sure the game session setup and not over.
-        require(gs.player_1 != address(0), "the session is not setup, please start game first!");
+        require(
+            gs.player_1 != address(0),
+            "the session is not setup, please start game first!"
+        );
         require(gs.winner == address(0), "the game is over");
-        
+
         // make sure the player is in the game session
         require(player == 1 || player == 2, "you must be player1 or player2"); //this is used to when player has the same address
-        
-        if(player == 1) {
+
+        if (player == 1) {
             // make sure it is player1's turn to move
-            require(gs.player_1 == msg.sender && gs.turn == msg.sender, "it is not your turn");
-            
+            require(
+                gs.player_1 == msg.sender && gs.turn == msg.sender,
+                "it is not your turn"
+            );
+
             // 1. if the position is not taken by the oppenent, then take the position
-            if(gs.player1Status[x * 3 + y] == 0 && gs.player2Status[x * 3 + y] == 0) {
-               gameSessions[sessionId].player1Status[x * 3 + y] = 1;
-               
-               // 2. check if player1 wins or make the turn to the opponent, send the message
-               if(checkWin(gameSessions[sessionId].player1Status)) {
-                   gameSessions[sessionId].winner = gameSessions[sessionId].player_1;
-               } else {
-                   gameSessions[sessionId].turn = gameSessions[sessionId].player_2;
-               }
-               sendMessage(destinationChainSelector, receiver, gameSessions[sessionId]);
+            if (
+                gs.player1Status[x * 3 + y] == 0 &&
+                gs.player2Status[x * 3 + y] == 0
+            ) {
+                gameSessions[sessionId].player1Status[x * 3 + y] = 1;
+
+                // 2. check if player1 wins or make the turn to the opponent, send the message
+                if (checkWin(gameSessions[sessionId].player1Status)) {
+                    gameSessions[sessionId].winner = gameSessions[sessionId]
+                        .player_1;
+                } else {
+                    gameSessions[sessionId].turn = gameSessions[sessionId]
+                        .player_2;
+                }
+                sendMessage(
+                    destinationChainSelector,
+                    receiver,
+                    gameSessions[sessionId]
+                );
             } else {
                 revert("the position is occupied");
             }
-        } else if(player == 2) {
+        } else if (player == 2) {
             // make sure it is player2's turn to move, this is the first step for player2
-            require((gs.player_2 == msg.sender && gs.turn == msg.sender) || gs.player_2 == address(0), "it is not your turn");
+            require(
+                (gs.player_2 == msg.sender && gs.turn == msg.sender) ||
+                    gs.player_2 == address(0),
+                "it is not your turn"
+            );
 
-            if(gs.player_2 == address(0)) {
+            if (gs.player_2 == address(0)) {
                 gameSessions[sessionId].player_2 = msg.sender;
             }
 
             // 1. if the position is not taken by the oppenent, then take the position
-            if(gs.player1Status[x * 3 + y] == 0 && gs.player2Status[x * 3 + y] == 0) {
-               gameSessions[sessionId].player2Status[x * 3 + y] = 1; 
+            if (
+                gs.player1Status[x * 3 + y] == 0 &&
+                gs.player2Status[x * 3 + y] == 0
+            ) {
+                gameSessions[sessionId].player2Status[x * 3 + y] = 1;
 
-               // 2. check if player1 wins or make the turn to the oppenent, send the message
-               if(checkWin(gameSessions[sessionId].player2Status)) {
-                   gameSessions[sessionId].winner = gameSessions[sessionId].player_2;
-               } else {
-                   gameSessions[sessionId].turn = gameSessions[sessionId].player_1;
-               }
-               sendMessage(destinationChainSelector, receiver, gameSessions[sessionId]);
+                // 2. check if player1 wins or make the turn to the oppenent, send the message
+                if (checkWin(gameSessions[sessionId].player2Status)) {
+                    gameSessions[sessionId].winner = gameSessions[sessionId]
+                        .player_2;
+                } else {
+                    gameSessions[sessionId].turn = gameSessions[sessionId]
+                        .player_1;
+                }
+                sendMessage(
+                    destinationChainSelector,
+                    receiver,
+                    gameSessions[sessionId]
+                );
             } else {
                 revert("the position is occupied");
             }
         }
-    } 
-
-    
+    }
 
     /// handle a received message
     function _ccipReceive(
@@ -223,7 +260,10 @@ contract TTTDemo is CCIPReceiver, OwnerIsCreator {
         bytes32 messageId = any2EvmMessage.messageId; // fetch the messageId
         uint64 sourceChainSelector = any2EvmMessage.sourceChainSelector; // fetch the source chain identifier (aka selector)
         address sender = abi.decode(any2EvmMessage.sender, (address)); // abi-decoding of the sender address
-        GameSession memory message = abi.decode(any2EvmMessage.data, (GameSession)); // abi-decoding of the sent string message
+        GameSession memory message = abi.decode(
+            any2EvmMessage.data,
+            (GameSession)
+        ); // abi-decoding of the sent string message
         receivedMessages.push(messageId);
         Message memory detail = Message(sourceChainSelector, sender, message);
         messageDetail[messageId] = detail;
@@ -276,45 +316,66 @@ contract TTTDemo is CCIPReceiver, OwnerIsCreator {
         );
     }
 
-
-    function horizontalCheck(uint8[9] memory playerStatus) private pure returns(bool horizontalValidation){
-        if(playerStatus[0] == 1 && playerStatus[1] == 1 && playerStatus[2] == 1) {
+    function horizontalCheck(
+        uint8[9] memory playerStatus
+    ) private pure returns (bool horizontalValidation) {
+        if (
+            playerStatus[0] == 1 && playerStatus[1] == 1 && playerStatus[2] == 1
+        ) {
             return true;
         }
 
-        if(playerStatus[3] == 1 && playerStatus[4] == 1 && playerStatus[5] == 1) {
+        if (
+            playerStatus[3] == 1 && playerStatus[4] == 1 && playerStatus[5] == 1
+        ) {
             return true;
         }
 
-        if(playerStatus[6] == 1 && playerStatus[7] == 1 && playerStatus[8] == 1) {
-            return true;
-        }
-
-        return false;
-    }
-
-    function verticalCheck(uint8[9] memory playerStatus) private pure returns(bool verticalValidation){
-        if(playerStatus[0] == 1 && playerStatus[3] == 1 && playerStatus[6] == 1) {
-            return true;
-        }
-
-        if(playerStatus[1] == 1 && playerStatus[4] == 1 && playerStatus[7] == 1) {
-            return true;
-        }
-
-        if(playerStatus[2] == 1 && playerStatus[5] == 1 && playerStatus[8] == 1) {
+        if (
+            playerStatus[6] == 1 && playerStatus[7] == 1 && playerStatus[8] == 1
+        ) {
             return true;
         }
 
         return false;
     }
 
-    function diagonalCheck(uint8[9] memory playerStatus) private pure returns(bool diagonalValidation){
-        if(playerStatus[0] == 1 && playerStatus[4] == 1 && playerStatus[8] == 1) {
+    function verticalCheck(
+        uint8[9] memory playerStatus
+    ) private pure returns (bool verticalValidation) {
+        if (
+            playerStatus[0] == 1 && playerStatus[3] == 1 && playerStatus[6] == 1
+        ) {
             return true;
         }
 
-        if(playerStatus[2] == 1 && playerStatus[4] == 1 && playerStatus[6] == 1) {
+        if (
+            playerStatus[1] == 1 && playerStatus[4] == 1 && playerStatus[7] == 1
+        ) {
+            return true;
+        }
+
+        if (
+            playerStatus[2] == 1 && playerStatus[5] == 1 && playerStatus[8] == 1
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    function diagonalCheck(
+        uint8[9] memory playerStatus
+    ) private pure returns (bool diagonalValidation) {
+        if (
+            playerStatus[0] == 1 && playerStatus[4] == 1 && playerStatus[8] == 1
+        ) {
+            return true;
+        }
+
+        if (
+            playerStatus[2] == 1 && playerStatus[4] == 1 && playerStatus[6] == 1
+        ) {
             return true;
         }
 

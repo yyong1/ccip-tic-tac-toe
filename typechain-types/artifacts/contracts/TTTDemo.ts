@@ -96,7 +96,7 @@ export interface TTTDemoInterface extends utils.Interface {
     "_router()": FunctionFragment;
     "acceptOwnership()": FunctionFragment;
     "ccipReceive((bytes32,uint64,bytes,bytes,(address,uint256)[]))": FunctionFragment;
-    "checkWin(bytes32)": FunctionFragment;
+    "checkWin(uint8[9])": FunctionFragment;
     "gameSessions(bytes32)": FunctionFragment;
     "getLastReceivedMessageDetails()": FunctionFragment;
     "getNumberOfReceivedMessages()": FunctionFragment;
@@ -113,7 +113,6 @@ export interface TTTDemoInterface extends utils.Interface {
     "supportsInterface(bytes4)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
     "updateRouter(address)": FunctionFragment;
-    "wcs(bytes32)": FunctionFragment;
     "withdraw(address)": FunctionFragment;
   };
 
@@ -139,7 +138,6 @@ export interface TTTDemoInterface extends utils.Interface {
       | "supportsInterface"
       | "transferOwnership"
       | "updateRouter"
-      | "wcs"
       | "withdraw"
   ): FunctionFragment;
 
@@ -154,7 +152,7 @@ export interface TTTDemoInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "checkWin",
-    values: [PromiseOrValue<BytesLike>]
+    values: [PromiseOrValue<BigNumberish>[]]
   ): string;
   encodeFunctionData(
     functionFragment: "gameSessions",
@@ -226,10 +224,6 @@ export interface TTTDemoInterface extends utils.Interface {
     values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
-    functionFragment: "wcs",
-    values: [PromiseOrValue<BytesLike>]
-  ): string;
-  encodeFunctionData(
     functionFragment: "withdraw",
     values: [PromiseOrValue<string>]
   ): string;
@@ -293,7 +287,6 @@ export interface TTTDemoInterface extends utils.Interface {
     functionFragment: "updateRouter",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "wcs", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
@@ -399,9 +392,9 @@ export interface TTTDemo extends BaseContract {
     ): Promise<ContractTransaction>;
 
     checkWin(
-      combination: PromiseOrValue<BytesLike>,
+      playerStatus: PromiseOrValue<BigNumberish>[],
       overrides?: CallOverrides
-    ): Promise<[boolean]>;
+    ): Promise<[boolean] & { _return: boolean }>;
 
     gameSessions(
       arg0: PromiseOrValue<BytesLike>,
@@ -504,11 +497,6 @@ export interface TTTDemo extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    wcs(
-      arg0: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
-
     withdraw(
       beneficiary: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -527,7 +515,7 @@ export interface TTTDemo extends BaseContract {
   ): Promise<ContractTransaction>;
 
   checkWin(
-    combination: PromiseOrValue<BytesLike>,
+    playerStatus: PromiseOrValue<BigNumberish>[],
     overrides?: CallOverrides
   ): Promise<boolean>;
 
@@ -630,11 +618,6 @@ export interface TTTDemo extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  wcs(
-    arg0: PromiseOrValue<BytesLike>,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
-
   withdraw(
     beneficiary: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -651,7 +634,7 @@ export interface TTTDemo extends BaseContract {
     ): Promise<void>;
 
     checkWin(
-      combination: PromiseOrValue<BytesLike>,
+      playerStatus: PromiseOrValue<BigNumberish>[],
       overrides?: CallOverrides
     ): Promise<boolean>;
 
@@ -754,11 +737,6 @@ export interface TTTDemo extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    wcs(
-      arg0: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
     withdraw(
       beneficiary: PromiseOrValue<string>,
       overrides?: CallOverrides
@@ -826,7 +804,7 @@ export interface TTTDemo extends BaseContract {
     ): Promise<BigNumber>;
 
     checkWin(
-      combination: PromiseOrValue<BytesLike>,
+      playerStatus: PromiseOrValue<BigNumberish>[],
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -908,11 +886,6 @@ export interface TTTDemo extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    wcs(
-      arg0: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     withdraw(
       beneficiary: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -932,7 +905,7 @@ export interface TTTDemo extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     checkWin(
-      combination: PromiseOrValue<BytesLike>,
+      playerStatus: PromiseOrValue<BigNumberish>[],
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1014,11 +987,6 @@ export interface TTTDemo extends BaseContract {
     updateRouter(
       routerAddr: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    wcs(
-      arg0: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     withdraw(

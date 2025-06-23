@@ -11,6 +11,7 @@ export class List extends React.Component {
     super(props);
 
     this.state = {
+      mounted: false,
       multi: false,
       disabled: false,
       loading: false,
@@ -35,7 +36,11 @@ export class List extends React.Component {
     };
   }
 
-  setValues = selectValues => this.setState({ selectValues });
+  componentDidMount() {
+    this.setState({ mounted: true });
+  }
+
+  setValues = (selectValues) => this.setState({ selectValues });
 
   contentRenderer = ({ props, state }) => {
     return (
@@ -87,10 +92,10 @@ export class List extends React.Component {
         </SearchAndToggle>
         <Items>
           {props.options
-            .filter(item =>
+            .filter((item) =>
               regexp.test(item[props.searchBy] || item[props.labelField])
             )
-            .map(option => {
+            .map((option) => {
               if (
                 !this.state.keepSelectedInList &&
                 methods.isSelected(option)
@@ -122,86 +127,82 @@ export class List extends React.Component {
 
   optionRenderer = ({ option, props, state, methods }) => (
     <React.Fragment>
-      <div onClick={event => methods.removeItem(event, option, true)}>
+      <div onClick={(event) => methods.removeItem(event, option, true)}>
         {option.label}
       </div>
     </React.Fragment>
   );
 
-
   render() {
-    return (
-        <div>
-          <div style={{ maxWidth: "350px", margin: "0 auto" }}>
-            <StyledSelect
-              placeholder={this.props.text}
-              addPlaceholder={this.state.addPlaceholder}
-              color={this.state.color}
-              disabled={this.state.disabled}
-              loading={this.state.loading}
-              searchBy={this.state.searchBy}
-              separator={this.state.separator}
-              clearable={this.state.clearable}
-              searchable={this.state.searchable}
-              create={this.state.create}
-              keepOpen={this.state.forceOpen}
-              dropdownHandle={this.state.handle}
-              dropdownHeight={this.state.dropdownHeight}
-              direction={this.state.direction}
-              multi={this.state.multi}
-              labelField={this.state.labelField}
-              valueField={this.state.valueField}
-              options={this.props.options}
-              dropdownGap={5}
-              keepSelectedInList={this.state.keepSelectedInList}
-              onDropdownOpen={() => undefined}
-              onDropdownClose={() => undefined}
-              onClearAll={() => undefined}
-              onSelectAll={() => undefined}
-              onChange={values => {
-                this.props.childToParent(values)
-                this.setValues(values)
-            }}
-              noDataLabel="No matches found"
-              closeOnSelect={this.state.closeOnSelect}
-              noDataRenderer={
-                this.state.noDataRenderer
-                  ? () => this.noDataRenderer()
-                  : undefined
-              }
-              dropdownPosition={this.state.dropdownPosition}
-              itemRenderer={
-                this.state.itemRenderer
-                  ? (item, itemIndex, props, state, methods) =>
-                      this.itemRenderer(item, itemIndex, props, state, methods)
-                  : undefined
-              }
-              optionRenderer={
-                this.state.optionRenderer
-                  ? (option, props, state, methods) =>
-                      this.optionRenderer(option, props, state, methods)
-                  : undefined
-              }
-              contentRenderer={
-                this.state.contentRenderer
-                  ? (innerProps, innerState) =>
-                      this.contentRenderer(innerProps, innerState)
-                  : undefined
-              }
-              dropdownRenderer={
-                this.state.dropdownRenderer
-                  ? (innerProps, innerState, innerMethods) =>
-                      this.dropdownRenderer(
-                        innerProps,
-                        innerState,
-                        innerMethods
-                      )
-                  : undefined
-              }
-            />
-          </div>
-        </div>
+    if (!this.state.mounted) return null;
 
+    return (
+      <div>
+        <div style={{ maxWidth: "350px", margin: "0 auto" }}>
+          <StyledSelect
+            placeholder={this.props.text}
+            addPlaceholder={this.state.addPlaceholder}
+            color={this.state.color}
+            disabled={this.state.disabled}
+            loading={this.state.loading}
+            searchBy={this.state.searchBy}
+            separator={this.state.separator}
+            clearable={this.state.clearable}
+            searchable={this.state.searchable}
+            create={this.state.create}
+            keepOpen={this.state.forceOpen}
+            dropdownHandle={this.state.handle}
+            dropdownHeight={this.state.dropdownHeight}
+            direction={this.state.direction}
+            multi={this.state.multi}
+            labelField={this.state.labelField}
+            valueField={this.state.valueField}
+            options={this.props.options}
+            dropdownGap={5}
+            keepSelectedInList={this.state.keepSelectedInList}
+            onDropdownOpen={() => undefined}
+            onDropdownClose={() => undefined}
+            onClearAll={() => undefined}
+            onSelectAll={() => undefined}
+            onChange={(values) => {
+              this.props.childToParent(values);
+              this.setValues(values);
+            }}
+            noDataLabel="No matches found"
+            closeOnSelect={this.state.closeOnSelect}
+            noDataRenderer={
+              this.state.noDataRenderer
+                ? () => this.noDataRenderer()
+                : undefined
+            }
+            dropdownPosition={this.state.dropdownPosition}
+            itemRenderer={
+              this.state.itemRenderer
+                ? (item, itemIndex, props, state, methods) =>
+                    this.itemRenderer(item, itemIndex, props, state, methods)
+                : undefined
+            }
+            optionRenderer={
+              this.state.optionRenderer
+                ? (option, props, state, methods) =>
+                    this.optionRenderer(option, props, state, methods)
+                : undefined
+            }
+            contentRenderer={
+              this.state.contentRenderer
+                ? (innerProps, innerState) =>
+                    this.contentRenderer(innerProps, innerState)
+                : undefined
+            }
+            dropdownRenderer={
+              this.state.dropdownRenderer
+                ? (innerProps, innerState, innerMethods) =>
+                    this.dropdownRenderer(innerProps, innerState, innerMethods)
+                : undefined
+            }
+          />
+        </div>
+      </div>
     );
   }
 }

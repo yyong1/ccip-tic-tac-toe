@@ -57,6 +57,7 @@ function NewGame() {
     resetBoard,
     disabledButton,
     setDisabledButton,
+    getBoardStatus,
   } = useContext(AppContext);
 
   const { address, isDisconnected } = useAccount();
@@ -78,24 +79,11 @@ function NewGame() {
     setBoardInterval();
   }, [playerChar]);
 
-  async function getBoardStatus() {
-    try {
-      if (sessionId) {
-        const TicTacToeContract = new Contract(
-          contractAddress[chainidMap[chain.id]],
-          abi,
-          signer
-        );
-        const boardStatus = await TicTacToeContract.getBoardStatus(sessionId);
-        refreshBoard(boardStatus);
-        return boardStatus;
-      } else {
-        return;
-      }
-    } catch (error) {
-      console.error(`Error: ${error}`);
+  React.useEffect(() => {
+    if (destinationChain && signer) {
+      updateAvailableGameSessions();
     }
-  }
+  }, [destinationChain, signer]);
 
   const updateAvailableGameSessions = async () => {
     try {
@@ -119,6 +107,7 @@ function NewGame() {
           value: sessionIds[i],
         });
       }
+      console.log(options);
       setSessionIds(options);
       setDisabledButton(false);
     } catch (e) {
@@ -131,8 +120,8 @@ function NewGame() {
     if (intervalId) {
       clearInterval(intervalId);
     }
-    let newGameInterval = setInterval(function () {
-      getBoardStatus();
+    let newGameInterval = setInterval(async function () {
+      await getBoardStatus();
     }, 10000);
     setIntervalId(newGameInterval);
   };
@@ -152,12 +141,16 @@ function NewGame() {
       );
       setTxHash(startGame.hash);
       await startGame.wait();
+      const sessions = await TicTacToeContract.getActiveSessions();
+      const newSessionId = sessions[sessions.length - 1];
+      setDisabledCell(false); // allow P1 to click immediately
+      await updateAvailableGameSessions();
       setText(
         "Game Started, Waiting for the other player on " +
           destinationChain.label +
           " to join."
       );
-      setSessionId("");
+      setSessionId(newSessionId);
       setTxHash(null);
       setDisabledButton(false);
       setPlayerChar("O");
@@ -179,6 +172,7 @@ function NewGame() {
     let gameSession = await TicTacToeContract.gameSessions(sessionId);
     let zero_address = "0x0000000000000000000000000000000000000000";
 
+    console.log("gameSession -->", gameSession);
     if (address == gameSession["player_1"]) {
       setPlayerNumber(1);
       setPlayerChar("O");
@@ -196,7 +190,7 @@ function NewGame() {
 
   const join = async () => {
     setText("Joining");
-    setDisabledCell(false);
+    // setDisabledCell(false);
     setPlayerDetails();
     setText("Joined the game. Refreshing the board!");
   };

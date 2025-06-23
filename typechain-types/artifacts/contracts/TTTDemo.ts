@@ -98,6 +98,8 @@ export interface TTTDemoInterface extends utils.Interface {
     "ccipReceive((bytes32,uint64,bytes,bytes,(address,uint256)[]))": FunctionFragment;
     "checkWin(uint8[9])": FunctionFragment;
     "gameSessions(bytes32)": FunctionFragment;
+    "getActiveSessions()": FunctionFragment;
+    "getBoardStatus(bytes32)": FunctionFragment;
     "getLastReceivedMessageDetails()": FunctionFragment;
     "getNumberOfReceivedMessages()": FunctionFragment;
     "getPlayer1Status(bytes32)": FunctionFragment;
@@ -123,6 +125,8 @@ export interface TTTDemoInterface extends utils.Interface {
       | "ccipReceive"
       | "checkWin"
       | "gameSessions"
+      | "getActiveSessions"
+      | "getBoardStatus"
       | "getLastReceivedMessageDetails"
       | "getNumberOfReceivedMessages"
       | "getPlayer1Status"
@@ -156,6 +160,14 @@ export interface TTTDemoInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "gameSessions",
+    values: [PromiseOrValue<BytesLike>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getActiveSessions",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getBoardStatus",
     values: [PromiseOrValue<BytesLike>]
   ): string;
   encodeFunctionData(
@@ -240,6 +252,14 @@ export interface TTTDemoInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "checkWin", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "gameSessions",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getActiveSessions",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getBoardStatus",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -409,6 +429,13 @@ export interface TTTDemo extends BaseContract {
       }
     >;
 
+    getActiveSessions(overrides?: CallOverrides): Promise<[string[]]>;
+
+    getBoardStatus(
+      _sessionId: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<[number[]] & { board: number[] }>;
+
     getLastReceivedMessageDetails(
       overrides?: CallOverrides
     ): Promise<
@@ -532,6 +559,13 @@ export interface TTTDemo extends BaseContract {
     }
   >;
 
+  getActiveSessions(overrides?: CallOverrides): Promise<string[]>;
+
+  getBoardStatus(
+    _sessionId: PromiseOrValue<BytesLike>,
+    overrides?: CallOverrides
+  ): Promise<number[]>;
+
   getLastReceivedMessageDetails(
     overrides?: CallOverrides
   ): Promise<
@@ -650,6 +684,13 @@ export interface TTTDemo extends BaseContract {
         turn: string;
       }
     >;
+
+    getActiveSessions(overrides?: CallOverrides): Promise<string[]>;
+
+    getBoardStatus(
+      _sessionId: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<number[]>;
 
     getLastReceivedMessageDetails(
       overrides?: CallOverrides
@@ -813,6 +854,13 @@ export interface TTTDemo extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getActiveSessions(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getBoardStatus(
+      _sessionId: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getLastReceivedMessageDetails(
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -911,6 +959,13 @@ export interface TTTDemo extends BaseContract {
 
     gameSessions(
       arg0: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getActiveSessions(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getBoardStatus(
+      _sessionId: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

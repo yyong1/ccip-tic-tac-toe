@@ -23,12 +23,17 @@ import MainLayout from "../layout/mainLayout";
 import { useRouter } from "next/router";
 
 const { chains, provider } = configureChains(
-  [mainnet, polygonMumbai, avalancheFuji],
-  [alchemyProvider({ apiKey: process.env.ALCHEMY_API_KEY }), publicProvider()]
+  // 1) we need to add a sepolia
+  [sepolia, polygonMumbai, avalancheFuji],
+  [
+    alchemyProvider({ apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY }),
+    publicProvider(),
+  ]
 );
 
 const { connectors } = getDefaultWallets({
   appName: "My Alchemy DApp",
+  // 2) ive added my rainbow app id
   projectId: "a5494b1429475449f5043376666ab322",
   chains,
 });

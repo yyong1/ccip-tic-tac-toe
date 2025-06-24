@@ -110,3 +110,34 @@ npx hardhat ttt-update-router \
 2. **Observe** the CCIP explorer screenshot below to verify the message flow.
 
 ![CCIP Explorer — Fuji to Sepolia message trace](img/ccip-explorer-screenshot.png)
+
+console play:
+
+npx hardhat ttt-start --source-blockchain ethereumSepolia --sender 0x25Ec5F66e5DDF9e9909E7fcB1A4Ee77FDF01De37 --destination-blockchain avalancheFuji --receiver 0x0081576a8F1ba51811ccE2d95B52C0457f9041E1
+
+npx hardhat ttt-move --x 0 --y 2 --player 2 --session-id 0x93a8723bda876ad669b3e7e87de81e96628e96f9b3f72db95ea1ce03ef10ceb2 --source-blockchain avalancheFuji --sender 0x0081576a8F1ba51811ccE2d95B52C0457f9041E1 --destination-blockchain ethereumSepolia --receiver 0x25Ec5F66e5DDF9e9909E7fcB1A4Ee77FDF01De37
+
+npx hardhat ttt-move --x 1 --y 2 --player 1 --session-id 0x93a8723bda876ad669b3e7e87de81e96628e96f9b3f72db95ea1ce03ef10ceb2 --source-blockchain ethereumSepolia --sender 0x25Ec5F66e5DDF9e9909E7fcB1A4Ee77FDF01De37 --destination-blockchain avalancheFuji --receiver 0x0081576a8F1ba51811ccE2d95B52C0457f9041E1
+
+npx hardhat ttt-check-winner --blockchain avalancheFuji --contract 0x0081576a8F1ba51811ccE2d95B52C0457f9041E1 --session-id 0x93a8723bda876ad669b3e7e87de81e96628e96f9b3f72db95ea1ce03ef10ceb2
+
+- improvements
+
+Front-end environment setup: Initialized the Next.js/RainbowKit/Wagmi stack for the UI.
+
+Chains configuration: Added Sepolia to the configureChains list so that our DApp can target both testnets.
+
+RainbowKit project ID: Updated the projectId for RainbowKit to match our app’s credentials.
+
+Hydration / hook errors: Swapped out a class component for a functional one to eliminate the “Invalid hook call” / hydration mismatch errors in the console.
+
+Alchemy API key: Moved the key into Next.js’s NEXT*PUBLIC*… env-var format so it loads correctly at build time.
+
+Contract–frontend wiring: Added the on-chain methods we needed in our Solidity demo (e.g. start, move, message events) and updated the ABI so the UI could fetch sessions, board state, turns, etc.
+
+there was no contract centric logic so it was hard to fix it fully.
+
+links:
+
+1. https://sepolia.etherscan.io/address/0x25Ec5F66e5DDF9e9909E7fcB1A4Ee77FDF01De37#readContract
+2. https://43113.testnet.snowtrace.io/address/0x0081576a8F1ba51811ccE2d95B52C0457f9041E1
